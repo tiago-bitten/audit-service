@@ -3,9 +3,10 @@ package config
 import "os"
 
 type AppConfig struct {
-	MongoURL string
-	Database string
-	Port     string
+	MongoURL    string
+	Database    string
+	Port        string
+	AdminAPIKey string
 }
 
 func LoadConfig() AppConfig {
@@ -20,8 +21,9 @@ func LoadConfig() AppConfig {
 	}
 
 	return AppConfig{
-		MongoURL: os.Getenv("MONGO_URL"),
-		Database: database,
-		Port:     port,
+		MongoURL:    os.Getenv("MONGO_URL"),
+		Database:    database,
+		Port:        port,
+		AdminAPIKey: os.Getenv("ADMIN_API_KEY"),
 	}
 }

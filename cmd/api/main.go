@@ -47,6 +47,7 @@ func main() {
 	projectRepo := projectRepository.NewMongoProjectRepository(db)
 
 	projectAuthMiddleware := middleware.NewProjectAuthMiddleware(projectRepo)
+	adminAuthMiddleware := middleware.NewAdminAuthMiddleware(appConfig.AdminAPIKey)
 
 	r := gin.Default()
 
@@ -59,6 +60,7 @@ func main() {
 	auditlogHttp.RegisterAuditLogRoutes(protectedGroup, auditlogApp)
 
 	adminGroup := r.Group("/v1")
+	adminGroup.Use(adminAuthMiddleware.Handle())
 	projectHttp.RegisterProjectRoutes(adminGroup, projectApp)
 
 	srv := &http.Server{
