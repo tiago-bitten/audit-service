@@ -48,8 +48,10 @@ func main() {
 
 	projectAuthMiddleware := middleware.NewProjectAuthMiddleware(projectRepo)
 	adminAuthMiddleware := middleware.NewAdminAuthMiddleware(appConfig.AdminAPIKey)
+	rateLimitMiddleware := middleware.NewRateLimitMiddleware(appConfig.RateLimitRequests, appConfig.RateLimitWindow)
 
 	r := gin.Default()
+	r.Use(rateLimitMiddleware.Handle())
 
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})

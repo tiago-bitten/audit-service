@@ -1,12 +1,18 @@
 package config
 
-import "os"
+import (
+	"os"
+	"strconv"
+	"time"
+)
 
 type AppConfig struct {
-	MongoURL    string
-	Database    string
-	Port        string
-	AdminAPIKey string
+	MongoURL          string
+	Database          string
+	Port              string
+	AdminAPIKey       string
+	RateLimitRequests int
+	RateLimitWindow   time.Duration
 }
 
 func LoadConfig() AppConfig {
@@ -20,10 +26,26 @@ func LoadConfig() AppConfig {
 		database = "auditservice"
 	}
 
+	rateLimitRequests := 100
+	if v := os.Getenv("RATE_LIMIT_REQUESTS"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil && n > 0 {
+			rateLimitRequests = n
+		}
+	}
+
+	rateLimitWindow := 60 * time.Second
+	if v := os.Getenv("RATE_LIMIT_WINDOW"); v != "" {
+		if d, err := time.ParseDuration(v); err == nil && d > 0 {
+			rateLimitWindow = d
+		}
+	}
+
 	return AppConfig{
-		MongoURL:    os.Getenv("MONGO_URL"),
-		Database:    database,
-		Port:        port,
-		AdminAPIKey: os.Getenv("ADMIN_API_KEY"),
+		MongoURL:          os.Getenv("MONGO_URL"),
+		Database:          database,
+		Port:              port,
+		AdminAPIKey:       os.Getenv("ADMIN_API_KEY"),
+		RateLimitRequests: rateLimitRequests,
+		RateLimitWindow:   rateLimitWindow,
 	}
 }
